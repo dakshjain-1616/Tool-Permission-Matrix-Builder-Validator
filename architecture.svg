@@ -1,0 +1,159 @@
+<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A0A00"/>
+      <stop offset="100%" stop-color="#1A1800"/>
+    </linearGradient>
+    <linearGradient id="fe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="be" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </linearGradient>
+    <linearGradient id="svc" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="ai" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/></filter>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#64748B"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="600" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="450" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#FEF3C7" letter-spacing="0.5">Tool Permission Matrix</text>
+  <text x="450" y="56" text-anchor="middle" font-size="11" fill="#92400E">Async FastAPI · React + Zustand + @dnd-kit · Policy Export · Claude Agent Validation</text>
+  <line x1="80" y1="66" x2="820" y2="66" stroke="#3B2500" stroke-width="1.5"/>
+
+  <!-- RISK LEGEND -->
+  <rect x="30" y="76" width="840" height="36" rx="8" fill="#1A0E00" stroke="#92400E" stroke-width="1"/>
+  <text x="80" y="97" font-size="10" font-weight="600" fill="#D97706">Risk Categories:</text>
+  <rect x="175" y="84" width="10" height="10" rx="2" fill="#22C55E"/>
+  <text x="192" y="95" font-size="9" fill="#86EFAC">read-only</text>
+  <rect x="265" y="84" width="10" height="10" rx="2" fill="#EAB308"/>
+  <text x="282" y="95" font-size="9" fill="#FEF08A">internal-write</text>
+  <rect x="380" y="84" width="10" height="10" rx="2" fill="#F97316"/>
+  <text x="397" y="95" font-size="9" fill="#FDBA74">external-api</text>
+  <rect x="480" y="84" width="10" height="10" rx="2" fill="#EF4444"/>
+  <text x="497" y="95" font-size="9" fill="#FCA5A5">financial</text>
+  <rect x="560" y="84" width="10" height="10" rx="2" fill="#DC2626"/>
+  <text x="577" y="95" font-size="9" fill="#FCA5A5">destructive</text>
+  <rect x="660" y="84" width="10" height="10" rx="2" fill="#991B1B"/>
+  <text x="677" y="95" font-size="9" fill="#FCA5A5">administrative</text>
+
+  <!-- FRONTEND LAYER -->
+  <rect x="30" y="122" width="840" height="115" rx="12" fill="#1A1000" stroke="#F59E0B" stroke-width="1.5" filter="url(#s)"/>
+  <rect x="30" y="122" width="840" height="30" rx="12" fill="url(#fe)" opacity="0.85"/>
+  <rect x="30" y="140" width="840" height="12" fill="url(#fe)" opacity="0.85"/>
+  <text x="450" y="141" text-anchor="middle" font-size="12" font-weight="700" fill="white" letter-spacing="2">BROWSER  —  React 18 + TypeScript + Zustand + @dnd-kit + Tailwind</text>
+
+  <rect x="48" y="162" width="118" height="62" rx="7" fill="#3B2000" stroke="#FCD34D" stroke-width="1"/>
+  <text x="107" y="178" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FDE68A">ToolRegistry</text>
+  <text x="107" y="192" text-anchor="middle" font-size="7.5" fill="#FEF3C7">CRUD + filter</text>
+  <text x="107" y="204" text-anchor="middle" font-size="7.5" fill="#FEF3C7">JSON import/export</text>
+  <text x="107" y="216" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Risk badge display</text>
+
+  <rect x="178" y="162" width="118" height="62" rx="7" fill="#3B2000" stroke="#FCD34D" stroke-width="1"/>
+  <text x="237" y="178" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FDE68A">RoleManager</text>
+  <text x="237" y="192" text-anchor="middle" font-size="7.5" fill="#FEF3C7">CRUD + hierarchy</text>
+  <text x="237" y="204" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Inheritance chains</text>
+  <text x="237" y="216" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Risk level limits</text>
+
+  <rect x="308" y="162" width="145" height="62" rx="7" fill="#3B2000" stroke="#FCD34D" stroke-width="1"/>
+  <text x="380" y="178" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FDE68A">PermissionMatrix</text>
+  <text x="380" y="192" text-anchor="middle" font-size="7.5" fill="#FEF3C7">@dnd-kit drag-drop</text>
+  <text x="380" y="204" text-anchor="middle" font-size="7.5" fill="#FEF3C7">ALLOWED/DENIED/INHERITED</text>
+  <text x="380" y="216" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Real-time validation</text>
+
+  <rect x="465" y="162" width="118" height="62" rx="7" fill="#3B2000" stroke="#FCD34D" stroke-width="1"/>
+  <text x="524" y="178" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FDE68A">PolicyExporter</text>
+  <text x="524" y="192" text-anchor="middle" font-size="7.5" fill="#FEF3C7">JSON download</text>
+  <text x="524" y="204" text-anchor="middle" font-size="7.5" fill="#FEF3C7">YAML download</text>
+  <text x="524" y="216" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Python module</text>
+
+  <rect x="595" y="162" width="128" height="62" rx="7" fill="#3B2000" stroke="#FCD34D" stroke-width="1"/>
+  <text x="659" y="178" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FDE68A">AgentValidator</text>
+  <text x="659" y="192" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Paste/upload code</text>
+  <text x="659" y="204" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Claude analysis</text>
+  <text x="659" y="216" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Security score</text>
+
+  <rect x="735" y="162" width="122" height="62" rx="7" fill="#3B2000" stroke="#FCD34D" stroke-width="1"/>
+  <text x="796" y="178" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FDE68A">SprawlAnalysis</text>
+  <text x="796" y="192" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Cell → permissions map</text>
+  <text x="796" y="204" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Over-exposure detect</text>
+  <text x="796" y="216" text-anchor="middle" font-size="7.5" fill="#FEF3C7">Sprawl score 0-100</text>
+
+  <!-- Arrow -->
+  <line x1="450" y1="239" x2="450" y2="262" stroke="#64748B" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+  <rect x="340" y="243" width="220" height="16" rx="8" fill="#0A0A00"/>
+  <text x="450" y="254" text-anchor="middle" font-size="9" fill="#64748B">HTTP · axios · 24 async routes</text>
+
+  <!-- BACKEND LAYER -->
+  <rect x="30" y="264" width="840" height="115" rx="12" fill="#200A0A" stroke="#EF4444" stroke-width="1.5" filter="url(#s)"/>
+  <rect x="30" y="264" width="840" height="30" rx="12" fill="url(#be)" opacity="0.85"/>
+  <rect x="30" y="282" width="840" height="12" fill="url(#be)" opacity="0.85"/>
+  <text x="450" y="283" text-anchor="middle" font-size="12" font-weight="700" fill="white" letter-spacing="2">ASYNC FASTAPI BACKEND  —  aiosqlite · SQLAlchemy · Python 3.11+</text>
+
+  <rect x="50" y="303" width="185" height="64" rx="8" fill="#3B0808" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="142" y="319" text-anchor="middle" font-size="10" font-weight="700" fill="#FCA5A5">24 Async Routes</text>
+  <text x="142" y="333" text-anchor="middle" font-size="8" fill="#FEE2E2">CRUD: tools, roles, permissions</text>
+  <text x="142" y="345" text-anchor="middle" font-size="8" fill="#FEE2E2">GET /api/matrix (all cells)</text>
+  <text x="142" y="357" text-anchor="middle" font-size="8" fill="#FEE2E2">GET /api/health · CORS env-config</text>
+
+  <rect x="250" y="303" width="185" height="64" rx="8" fill="#3B0808" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="342" y="319" text-anchor="middle" font-size="10" font-weight="700" fill="#FCA5A5">policy_generator.py</text>
+  <text x="342" y="333" text-anchor="middle" font-size="8" fill="#FEE2E2">JSON / YAML output</text>
+  <text x="342" y="345" text-anchor="middle" font-size="8" fill="#FEE2E2">Python module + py_compile</text>
+  <text x="342" y="357" text-anchor="middle" font-size="8" fill="#FEE2E2">check_permission(role, tool)</text>
+
+  <rect x="450" y="303" width="185" height="64" rx="8" fill="#3B0808" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="542" y="319" text-anchor="middle" font-size="10" font-weight="700" fill="#FCA5A5">agent_validator.py</text>
+  <text x="542" y="333" text-anchor="middle" font-size="8" fill="#FEE2E2">Regex tool extraction</text>
+  <text x="542" y="345" text-anchor="middle" font-size="8" fill="#FEE2E2">Claude or heuristic path</text>
+  <text x="542" y="357" text-anchor="middle" font-size="8" fill="#FEE2E2">Security score + issues</text>
+
+  <rect x="650" y="303" width="185" height="64" rx="8" fill="#3B0808" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="742" y="319" text-anchor="middle" font-size="10" font-weight="700" fill="#FCA5A5">sprawl_analyzer.py</text>
+  <text x="742" y="333" text-anchor="middle" font-size="8" fill="#FEE2E2">Real cell permissions map</text>
+  <text x="742" y="345" text-anchor="middle" font-size="8" fill="#FEE2E2">Over-exposure metrics</text>
+  <text x="742" y="357" text-anchor="middle" font-size="8" fill="#FEE2E2">Claude or numeric fallback</text>
+
+  <!-- Arrow to services -->
+  <line x1="350" y1="380" x2="350" y2="404" stroke="#64748B" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+  <line x1="550" y1="380" x2="550" y2="404" stroke="#64748B" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+
+  <!-- DB + Claude row -->
+  <rect x="30" y="406" width="380" height="82" rx="12" fill="#082010" stroke="#10B981" stroke-width="1.5" filter="url(#s)"/>
+  <text x="220" y="425" text-anchor="middle" font-size="11" font-weight="700" fill="#6EE7B7">SQLite (aiosqlite)</text>
+  <text x="220" y="441" text-anchor="middle" font-size="8.5" fill="#A7F3D0">Tool · Role · Permission models</text>
+  <text x="220" y="453" text-anchor="middle" font-size="8.5" fill="#A7F3D0">3-state: ALLOWED / DENIED / INHERITED</text>
+  <text x="220" y="465" text-anchor="middle" font-size="8.5" fill="#A7F3D0">Async sessions via aiosqlite</text>
+  <text x="220" y="477" text-anchor="middle" font-size="8.5" fill="#A7F3D0">RiskCategory Python Enum</text>
+
+  <rect x="490" y="406" width="380" height="82" rx="12" fill="#1A1040" stroke="#8B5CF6" stroke-width="1.5" filter="url(#s)"/>
+  <text x="680" y="425" text-anchor="middle" font-size="11" font-weight="700" fill="#DDD6FE">Anthropic API</text>
+  <text x="680" y="441" text-anchor="middle" font-size="8.5" fill="#C4B5FD">claude-sonnet-4-20250514</text>
+  <text x="680" y="453" text-anchor="middle" font-size="8.5" fill="#C4B5FD">Agent code analysis (validator)</text>
+  <text x="680" y="465" text-anchor="middle" font-size="8.5" fill="#C4B5FD">Sprawl narrative (analyzer)</text>
+  <text x="680" y="477" text-anchor="middle" font-size="8.5" fill="#C4B5FD">Heuristic fallback when no key</text>
+
+  <!-- Zustand stores callout -->
+  <rect x="30" y="500" width="840" height="60" rx="10" fill="#0A0800" stroke="#4B3500" stroke-width="1"/>
+  <text x="200" y="520" text-anchor="middle" font-size="10" font-weight="600" fill="#D97706">Zustand Stores</text>
+  <rect x="50" y="528" width="100" height="20" rx="5" fill="#1A1000" stroke="#92400E" stroke-width="1"/>
+  <text x="100" y="542" text-anchor="middle" font-size="8.5" fill="#FCD34D">toolStore.ts</text>
+  <rect x="165" y="528" width="100" height="20" rx="5" fill="#1A1000" stroke="#92400E" stroke-width="1"/>
+  <text x="215" y="542" text-anchor="middle" font-size="8.5" fill="#FCD34D">roleStore.ts</text>
+  <rect x="280" y="528" width="115" height="20" rx="5" fill="#1A1000" stroke="#92400E" stroke-width="1"/>
+  <text x="337" y="542" text-anchor="middle" font-size="8.5" fill="#FCD34D">matrixStore.ts</text>
+  <text x="580" y="534" font-size="9" fill="#64748B">22/22 pytest · 110 modules / 276KB · CORS env-configurable</text>
+  <text x="580" y="548" font-size="9" fill="#64748B">py_compile gate on Python policy · sprawl sends real cells</text>
+</svg>

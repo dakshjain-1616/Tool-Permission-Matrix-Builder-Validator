@@ -1,0 +1,58 @@
+{
+  "policy_version": "1.0",
+  "tools": {
+    "1": {"id": 1, "name": "search_knowledge_base", "risk_category": "read-only", "description": "Search knowledge base"},
+    "2": {"id": 2, "name": "create_document", "risk_category": "internal-write", "description": "Create documents"},
+    "3": {"id": 3, "name": "send_email", "risk_category": "external-api", "description": "Send emails"},
+    "4": {"id": 4, "name": "process_payment", "risk_category": "financial", "description": "Process payments"},
+    "5": {"id": 5, "name": "delete_resource", "risk_category": "destructive", "description": "Delete resources"},
+    "6": {"id": 6, "name": "list_users", "risk_category": "administrative", "description": "List users"},
+    "7": {"id": 7, "name": "read_file", "risk_category": "read-only", "description": "Read files"},
+    "8": {"id": 8, "name": "update_configuration", "risk_category": "administrative", "description": "Update config"}
+  },
+  "roles": {
+    "1": {"id": 1, "name": "viewer", "description": "Can only read"},
+    "2": {"id": 2, "name": "editor", "description": "Can read and write"},
+    "3": {"id": 3, "name": "admin", "description": "Full access"}
+  },
+  "permissions": {
+    "1": {
+      "1": {"allowed": true, "inherited": false},
+      "2": {"allowed": false, "inherited": false},
+      "3": {"allowed": false, "inherited": false},
+      "4": {"allowed": false, "inherited": false},
+      "5": {"allowed": false, "inherited": false},
+      "6": {"allowed": false, "inherited": false},
+      "7": {"allowed": true, "inherited": false},
+      "8": {"allowed": false, "inherited": false}
+    },
+    "2": {
+      "1": {"allowed": true, "inherited": false},
+      "2": {"allowed": true, "inherited": false},
+      "3": {"allowed": true, "inherited": false},
+      "4": {"allowed": false, "inherited": false},
+      "5": {"allowed": false, "inherited": false},
+      "6": {"allowed": false, "inherited": false},
+      "7": {"allowed": true, "inherited": false},
+      "8": {"allowed": false, "inherited": false}
+    },
+    "3": {
+      "1": {"allowed": true, "inherited": false},
+      "2": {"allowed": true, "inherited": false},
+      "3": {"allowed": true, "inherited": false},
+      "4": {"allowed": true, "inherited": false},
+      "5": {"allowed": true, "inherited": false},
+      "6": {"allowed": true, "inherited": false},
+      "7": {"allowed": true, "inherited": false},
+      "8": {"allowed": true, "inherited": false}
+    }
+  },
+  "risk_thresholds": {
+    "read-only": {"max_score": 10, "color": "green"},
+    "internal-write": {"max_score": 30, "color": "green"},
+    "external-api": {"max_score": 50, "color": "yellow"},
+    "financial": {"max_score": 70, "color": "orange"},
+    "destructive": {"max_score": 90, "color": "red"},
+    "administrative": {"max_score": 100, "color": "red"}
+  }
+}
