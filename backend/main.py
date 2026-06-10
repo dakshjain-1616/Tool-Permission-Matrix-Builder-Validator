@@ -116,6 +116,7 @@ async def create_tool(tool_data: ToolCreate, db: AsyncSession = Depends(get_db))
     )
     db.add(tool)
     await db.flush()
+    await db.commit()
     await db.refresh(tool)
     return tool
 
@@ -139,6 +140,7 @@ async def update_tool(tool_id: int, tool_data: ToolUpdate, db: AsyncSession = De
         setattr(tool, key, value)
 
     await db.flush()
+    await db.commit()
     await db.refresh(tool)
     return tool
 
@@ -151,6 +153,7 @@ async def delete_tool(tool_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Tool not found")
     await db.delete(tool)
     await db.flush()
+    await db.commit()
     return MessageResponse(message=f"Tool '{tool.name}' deleted")
 
 
@@ -193,6 +196,7 @@ async def create_role(role_data: RoleCreate, db: AsyncSession = Depends(get_db))
     )
     db.add(role)
     await db.flush()
+    await db.commit()
     await db.refresh(role)
     return role
 
@@ -218,6 +222,7 @@ async def update_role(role_id: int, role_data: RoleUpdate, db: AsyncSession = De
         setattr(role, key, value)
 
     await db.flush()
+    await db.commit()
     await db.refresh(role)
     return role
 
@@ -230,6 +235,7 @@ async def delete_role(role_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Role not found")
     await db.delete(role)
     await db.flush()
+    await db.commit()
     return MessageResponse(message=f"Role '{role.name}' deleted")
 
 
@@ -276,6 +282,7 @@ async def create_permission(perm_data: PermissionCreate, db: AsyncSession = Depe
     permission = Permission(**perm_data.model_dump())
     db.add(permission)
     await db.flush()
+    await db.commit()
     await db.refresh(permission)
     return permission
 
@@ -294,6 +301,7 @@ async def update_permission(
         setattr(permission, key, value)
 
     await db.flush()
+    await db.commit()
     await db.refresh(permission)
     return permission
 
@@ -327,6 +335,7 @@ async def bulk_update_permissions(
             await db.refresh(permission)
             results.append(permission)
 
+    await db.commit()
     return results
 
 
@@ -338,6 +347,7 @@ async def delete_permission(permission_id: int, db: AsyncSession = Depends(get_d
         raise HTTPException(status_code=404, detail="Permission not found")
     await db.delete(permission)
     await db.flush()
+    await db.commit()
     return MessageResponse(message=f"Permission {permission_id} deleted")
 
 
@@ -395,8 +405,14 @@ async def generate_policy(
     )
     roles = roles_result.scalars().all()
 
-    if not tools or not roles:
+    if not request.tools or not request.roles:
         raise HTTPException(status_code=400, detail="Must include at least one tool and one role")
+
+    if not tools:
+        raise HTTPException(status_code=404, detail=f"No tools found for the provided IDs: {request.tools}")
+
+    if not roles:
+        raise HTTPException(status_code=404, detail=f"No roles found for the provided IDs: {request.roles}")
 
     # Get permissions for these combos
     perms_result = await db.execute(
@@ -461,7 +477,7 @@ async def validate_agent(
 ):
     """Validate agent code against a permission policy."""
     validator = AgentValidator()
-    result = validator.validate(request.agent_code, request.policy_json)
+    result = await validator.validate(request.agent_code, request.policy_json)
 
     issues = [
         ValidationIssue(**issue) for issue in result.get("issues", [])
@@ -485,7 +501,7 @@ async def sprawl_analysis(
 ):
     """Analyze permission matrix for sprawl."""
     analyzer = SprawlAnalyzer()
-    result = analyzer.analyze(
+    result = await analyzer.analyze(
         matrix=request.matrix,
         tools=request.tools,
         roles=request.roles,

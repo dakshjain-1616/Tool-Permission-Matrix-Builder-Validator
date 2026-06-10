@@ -146,11 +146,11 @@ def generate_python_module(matrix: list[dict[str, Any]], tools: list[dict[str, A
     # Add tool definitions
     for tid, tool in json_policy["tools"].items():
         tid_int = int(tid)
-        name_escaped = tool["name"].replace("'", "\\'")
-        risk_cat = tool.get("risk_category", "read-only")
-        desc = tool.get("description", "")
-        endpoint = tool.get("endpoint", "")
-        lines.append(f"    {tid_int}: ToolDefinition(id={tid_int}, name='{name_escaped}', risk_category='{risk_cat}', description='{desc}', endpoint='{endpoint}'),")
+        name_r = repr(tool["name"])
+        risk_cat_r = repr(tool.get("risk_category", "read-only"))
+        desc_r = repr(tool.get("description", ""))
+        endpoint_r = repr(tool.get("endpoint", ""))
+        lines.append(f"    {tid_int}: ToolDefinition(id={tid_int}, name={name_r}, risk_category={risk_cat_r}, description={desc_r}, endpoint={endpoint_r}),")
 
     lines += [
         "}",
@@ -161,11 +161,11 @@ def generate_python_module(matrix: list[dict[str, Any]], tools: list[dict[str, A
 
     for rid, role in json_policy["roles"].items():
         rid_int = int(rid)
-        name_escaped = role["name"].replace("'", "\\'")
-        desc = role.get("description", "")
+        name_r = repr(role["name"])
+        desc_r = repr(role.get("description", ""))
         parent = role.get("parent_role_id")
         parent_str = f"parent_role_id={parent}" if parent is not None else ""
-        lines.append(f"    {rid_int}: RoleDefinition(id={rid_int}, name='{name_escaped}', description='{desc}'{', ' + parent_str if parent_str else ''}),")
+        lines.append(f"    {rid_int}: RoleDefinition(id={rid_int}, name={name_r}, description={desc_r}{', ' + parent_str if parent_str else ''}),")
 
     lines += [
         "}",

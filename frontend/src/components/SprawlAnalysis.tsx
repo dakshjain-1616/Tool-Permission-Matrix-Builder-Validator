@@ -24,8 +24,10 @@ export const SprawlAnalysis: React.FC = () => {
     };
   };
 
+  const cellsKey = cells.map(c => `${c.role_id}:${c.tool_id}:${c.allowed}:${c.inherited}`).join(",");
+
   useEffect(() => {
-    if (tools.length > 0 && roles.length > 0 && !sprawlResult) {
+    if (tools.length > 0 && roles.length > 0) {
       analyzeSprawl(
         buildMatrixData(),
         tools.map((t) => ({
@@ -42,7 +44,7 @@ export const SprawlAnalysis: React.FC = () => {
         }))
       );
     }
-  }, [tools.length, roles.length, cells.length]);
+  }, [cellsKey, tools.length, roles.length]);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -165,7 +167,9 @@ export const SprawlAnalysis: React.FC = () => {
                   <div key={label} className="border rounded-lg p-6 text-center">
                     <div className="text-sm text-gray-500 mb-1">{label}</div>
                     <div className="text-3xl font-bold text-gray-800">
-                      {value !== undefined ? String(value) : "—"}
+                      {value !== undefined && (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean')
+                        ? String(value)
+                        : "—"}
                     </div>
                   </div>
                 ))}

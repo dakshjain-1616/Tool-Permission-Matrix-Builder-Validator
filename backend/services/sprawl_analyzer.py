@@ -1,11 +1,14 @@
 """Sprawl analysis service using Claude to analyze permission matrix for sprawl."""
 
 import json
+import logging
 import os
 import re
 from typing import Any
 
-from anthropic import Anthropic
+from anthropic import AsyncAnthropic
+
+logger = logging.getLogger(__name__)
 
 
 def _api_key() -> str:
@@ -26,17 +29,15 @@ def _model() -> str:
     return os.environ.get("MODEL_NAME", "claude-sonnet-4-20250514")
 
 
-CLAUDE_MODEL = _model()
-
-
 class SprawlAnalyzer:
     """Analyzes permission matrices for sprawl: excessive access, redundancy, over-exposure."""
 
     def __init__(self, api_key: str | None = None):
         self.api_key = api_key or _api_key()
-        self.client = Anthropic(**_client_kwargs(self.api_key)) if self.api_key else None
+        self.model = _model()
+        self.client = AsyncAnthropic(**_client_kwargs(self.api_key)) if self.api_key else None
 
-    def analyze(
+    async def analyze(
         self,
         matrix: dict[str, Any],
         tools: list[dict[str, Any]],
@@ -57,10 +58,10 @@ class SprawlAnalyzer:
         # If Claude is available, enhance with AI analysis
         if self.client:
             try:
-                claude_result = self._claude_analysis(matrix, tools, roles)
+                claude_result = await self._claude_analysis(matrix, tools, roles)
                 # Merge: use Claude's score and analysis, keep heuristic issues + recommendations
                 heuristic_result["sprawl_score"] = claude_result.get("sprawl_score", heuristic_result["sprawl_score"])
-                heuristic_result["analysis"] = claude_result.get("analysis", heuristic_result["analysis"])
+                heuristic_result["analysis"] = claude_result.get("analysis") or heuristic_result["analysis"]
                 heuristic_result["analysis"] += "\n\n---\n\n" + claude_result.get("claude_notes", "")
 
                 # Add any new issues from Claude not already in heuristic
@@ -86,6 +87,19 @@ class SprawlAnalyzer:
 
         return heuristic_result
 
+    @staticmethod
+    def _is_allowed(perm: Any) -> bool:
+        """Accept both dict form {'allowed': True} and string form 'ALLOWED'/'INHERITED'/'DENIED'."""
+        if isinstance(perm, dict):
+            return bool(perm.get('allowed', False))
+        return str(perm).upper() in ('ALLOWED', 'INHERITED')
+
+    @staticmethod
+    def _is_inherited(perm: Any) -> bool:
+        if isinstance(perm, dict):
+            return bool(perm.get('inherited', False))
+        return str(perm).upper() == 'INHERITED'
+
     def _heuristic_analysis(
         self, matrix: dict[str, Any], tools: list[dict[str, Any]], roles: list[dict[str, Any]]
     ) -> dict[str, Any]:
@@ -103,7 +117,7 @@ class SprawlAnalyzer:
         total_allowed = sum(
             1 for role_perms in permissions.values()
             for perm in role_perms.values()
-            if perm.get("allowed", False)
+            if self._is_allowed(perm)
         )
         total_denied = total_permissions - total_allowed
 
@@ -119,7 +133,7 @@ class SprawlAnalyzer:
         for rid, role_perms in permissions.items():
             if not role_perms:
                 continue
-            allowed_count = sum(1 for p in role_perms.values() if p.get("allowed", False))
+            allowed_count = sum(1 for p in role_perms.values() if self._is_allowed(p))
             pct_allowed = (allowed_count / len(role_perms)) * 100
 
             role_name = known_roles.get(rid, {}).get("name", f"role-{rid}")
@@ -137,7 +151,7 @@ class SprawlAnalyzer:
             # Check for high-risk tools allowed
             high_risk_allowed = []
             for tid, perm in role_perms.items():
-                if perm.get("allowed", False):
+                if self._is_allowed(perm):
                     tool = known_tools.get(tid, {})
                     if tool.get("risk_category") in ("destructive", "administrative"):
                         high_risk_allowed.append(tool.get("name", f"tool-{tid}"))
@@ -157,7 +171,7 @@ class SprawlAnalyzer:
             tid = str(tool["id"])
             allowed_roles = []
             for rid, role_perms in permissions.items():
-                if tid in role_perms and role_perms[tid].get("allowed", False):
+                if tid in role_perms and self._is_allowed(role_perms[tid]):
                     allowed_roles.append(known_roles.get(rid, {}).get("name", f"role-{rid}"))
 
             if len(allowed_roles) == len(roles) and len(roles) > 2:
@@ -173,7 +187,7 @@ class SprawlAnalyzer:
         # 3. Check for redundant permissions (inherited but also explicit)
         for rid, role_perms in permissions.items():
             for tid, perm in role_perms.items():
-                if perm.get("allowed", False) and perm.get("inherited", False):
+                if self._is_allowed(perm) and self._is_inherited(perm):
                     # This is fine, but note it
                     pass
 
@@ -181,7 +195,7 @@ class SprawlAnalyzer:
         for tool in tools:
             tid = str(tool["id"])
             allowed_any = any(
-                tid in rp and rp[tid].get("allowed", False)
+                tid in rp and self._is_allowed(rp[tid])
                 for rp in permissions.values()
             )
             if not allowed_any:
@@ -246,7 +260,7 @@ class SprawlAnalyzer:
 
         return min(100, score)
 
-    def _claude_analysis(
+    async def _claude_analysis(
         self, matrix: dict[str, Any], tools: list[dict[str, Any]], roles: list[dict[str, Any]]
     ) -> dict[str, Any]:
         """Use Claude to enhance sprawl analysis."""
@@ -278,19 +292,31 @@ Matrix: {json.dumps(matrix, indent=2)[:10000]}
 Return a JSON analysis."""
 
         try:
-            response = self.client.messages.create(
-                model=CLAUDE_MODEL,
+            response = await self.client.messages.create(
+                model=self.model,
                 max_tokens=4000,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_message}],
             )
 
             content = next((b.text for b in response.content if b.type == "text"), "") if response.content else ""
-            json_match = re.search(r'\{.*\}', content, re.DOTALL)
-            if json_match:
-                result = json.loads(json_match.group())
-            else:
-                result = {}
+
+            # Extract JSON from response using brace-depth scan
+            result = {}
+            start = content.find('{')
+            if start != -1:
+                depth = 0
+                for i, ch in enumerate(content[start:], start):
+                    if ch == '{':
+                        depth += 1
+                    elif ch == '}':
+                        depth -= 1
+                        if depth == 0:
+                            try:
+                                result = json.loads(content[start:i+1])
+                            except json.JSONDecodeError as exc:
+                                logger.warning("Failed to parse Claude JSON response: %s", exc)
+                            break
 
             result.setdefault("sprawl_score", 50)
             result.setdefault("issues", [])
@@ -301,6 +327,7 @@ Return a JSON analysis."""
             return result
 
         except Exception as e:
+            logger.error("Claude sprawl analysis failed: %s", e, exc_info=True)
             return {
                 "sprawl_score": 50,
                 "issues": [],

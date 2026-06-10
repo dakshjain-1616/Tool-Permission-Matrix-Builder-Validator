@@ -46,7 +46,10 @@ export const AgentValidator: React.FC = () => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      setAgentCode(event.target?.result as string);
+      const result = event.target?.result;
+      if (typeof result === 'string') {
+        setAgentCode(result);
+      }
     };
     reader.readAsText(file);
   };

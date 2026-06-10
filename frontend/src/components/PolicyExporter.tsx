@@ -6,17 +6,17 @@ import { useMatrixStore } from "../stores/matrixStore";
 export const PolicyExporter: React.FC = () => {
   const { tools } = useToolStore();
   const { roles } = useRoleStore();
-  const { policyResult, policyLoading, generatePolicy, resetPolicy } = useMatrixStore();
+  const { policyResult, policyLoading, error: policyError, generatePolicy, resetPolicy } = useMatrixStore();
   const [selectedTools, setSelectedTools] = useState<number[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
   const [format, setFormat] = useState<"json" | "yaml" | "python">("json");
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (selectedTools.length === 0 || selectedRoles.length === 0) {
       alert("Please select at least one tool and one role");
       return;
     }
-    generatePolicy(selectedTools, selectedRoles);
+    await generatePolicy(selectedTools, selectedRoles);
   };
 
   const handleDownload = () => {
@@ -188,11 +188,17 @@ export const PolicyExporter: React.FC = () => {
         {/* Results */}
         <div className="border rounded p-4">
           <h3 className="font-semibold mb-3">Generated Policy</h3>
-          {!policyResult && (
+          {!policyResult && !policyLoading && (
             <div className="text-center py-12 text-gray-400">
               <p className="text-lg mb-2">📄</p>
               <p>Select tools and roles, then click Generate</p>
               <p className="text-sm mt-1">Policy will be displayed here</p>
+            </div>
+          )}
+          {policyError && !policyResult && !policyLoading && (
+            <div className="text-center py-12 text-red-500">
+              <p className="text-lg mb-2">Error</p>
+              <p>{policyError}</p>
             </div>
           )}
           {policyLoading && (

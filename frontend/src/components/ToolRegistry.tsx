@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useToolStore } from "../stores/toolStore";
 import { RISK_CATEGORIES, RISK_BG_CLASSES } from "../types";
-import type { ToolCreate, ToolUpdate, RiskCategory } from "../types";
+import type { ToolCreate, ToolUpdate, ToolResponse, RiskCategory } from "../types";
 
 const defaultTool: ToolCreate = {
   name: "",
@@ -39,18 +39,21 @@ export const ToolRegistry: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let result: ToolResponse | null;
     if (editingId !== null) {
       const update: ToolUpdate = {};
       if (form.name !== "") update.name = form.name;
       if (form.description !== "") update.description = form.description;
       if (form.risk_category !== "read-only") update.risk_category = form.risk_category;
-      await updateTool(editingId, form);
+      result = await updateTool(editingId, form);
     } else {
-      await createTool(form);
+      result = await createTool(form);
     }
-    setShowForm(false);
-    setEditingId(null);
-    setForm({ ...defaultTool });
+    if (result !== null) {
+      setShowForm(false);
+      setEditingId(null);
+      setForm({ ...defaultTool });
+    }
   };
 
   const handleEdit = (tool: typeof tools[0]) => {
@@ -77,24 +80,26 @@ export const ToolRegistry: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleImportJson = () => {
+  const handleImportJson = async () => {
     try {
       const parsed = JSON.parse(jsonImport);
       const arr = Array.isArray(parsed) ? parsed : [parsed];
-      arr.forEach(async (item: Record<string, unknown>) => {
-        await createTool({
-          name: String(item.name || ""),
-          description: item.description ? String(item.description) : "",
-          risk_category: String(item.risk_category || "read-only"),
-          endpoint: item.endpoint ? String(item.endpoint) : "",
-          required_permissions: item.required_permissions ? String(item.required_permissions) : "",
-          tags: item.tags ? String(item.tags) : "",
-          active: item.active !== undefined ? Boolean(item.active) : true,
-        });
-      });
+      await Promise.all(
+        arr.map((item: Record<string, unknown>) =>
+          createTool({
+            name: String(item.name || ""),
+            description: item.description ? String(item.description) : "",
+            risk_category: String(item.risk_category || "read-only"),
+            endpoint: item.endpoint ? String(item.endpoint) : "",
+            required_permissions: item.required_permissions ? String(item.required_permissions) : "",
+            tags: item.tags ? String(item.tags) : "",
+            active: item.active !== undefined ? Boolean(item.active) : true,
+          })
+        )
+      );
       setJsonImport("");
     } catch {
-      alert("Invalid JSON format");
+      alert("Invalid JSON format or one or more tools failed to import");
     }
   };
 

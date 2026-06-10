@@ -1,11 +1,14 @@
 """Agent validator service using Claude to analyze agent code against permission matrix."""
 
 import json
+import logging
 import os
 import re
 from typing import Any
 
 from anthropic import Anthropic
+
+logger = logging.getLogger(__name__)
 
 
 def _api_key() -> str:
@@ -26,14 +29,12 @@ def _model() -> str:
     return os.environ.get("MODEL_NAME", "claude-sonnet-4-20250514")
 
 
-CLAUDE_MODEL = _model()
-
-
 class AgentValidator:
     """Validates agent code against a permission matrix using Claude."""
 
     def __init__(self, api_key: str | None = None):
         self.api_key = api_key or _api_key()
+        self.model = _model()
         self.client = Anthropic(**_client_kwargs(self.api_key)) if self.api_key else None
 
     def _extract_tool_calls(self, agent_code: str) -> list[str]:
@@ -209,7 +210,7 @@ Analyze the security implications and return a JSON response."""
 
         try:
             response = self.client.messages.create(
-                model=CLAUDE_MODEL,
+                model=self.model,
                 max_tokens=4000,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_message}],
@@ -217,12 +218,22 @@ Analyze the security implications and return a JSON response."""
 
             content = next((b.text for b in response.content if b.type == "text"), "") if response.content else ""
 
-            # Extract JSON from response
-            json_match = re.search(r'\{.*\}', content, re.DOTALL)
-            if json_match:
-                result = json.loads(json_match.group())
-            else:
-                result = {}
+            # Extract JSON from response using brace-depth scan
+            result = {}
+            start = content.find('{')
+            if start != -1:
+                depth = 0
+                for i, ch in enumerate(content[start:], start):
+                    if ch == '{':
+                        depth += 1
+                    elif ch == '}':
+                        depth -= 1
+                        if depth == 0:
+                            try:
+                                result = json.loads(content[start:i+1])
+                            except json.JSONDecodeError as exc:
+                                logger.warning("Failed to parse Claude JSON response: %s", exc)
+                            break
 
             result.setdefault("security_score", 50)
             result.setdefault("issues", [])
@@ -237,6 +248,7 @@ Analyze the security implications and return a JSON response."""
             return result
 
         except Exception as e:
+            logger.error("Claude analysis failed: %s", e, exc_info=True)
             return {
                 "security_score": 0,
                 "issues": [{

@@ -1,6 +1,6 @@
 """SQLAlchemy ORM models for Tool Permission Matrix."""
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
     Column, Integer, String, Text, Boolean, DateTime,
     Enum as SAEnum, ForeignKey, UniqueConstraint
@@ -33,8 +33,8 @@ class Tool(Base):
     required_permissions = Column(Text, nullable=True)  # JSON string of required perms
     tags = Column(Text, nullable=True)  # JSON string array
     active = Column(Boolean, default=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     permissions = relationship("Permission", back_populates="tool", cascade="all, delete-orphan")
 
@@ -51,8 +51,8 @@ class Role(Base):
     parent_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     allowed_risk_levels = Column(Text, nullable=True)  # JSON string array of RiskCategory values
     is_system_role = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     parent_role = relationship("Role", remote_side=[id], backref="child_roles")
     permissions = relationship("Permission", back_populates="role", cascade="all, delete-orphan")
@@ -73,8 +73,8 @@ class Permission(Base):
     allowed = Column(Boolean, nullable=False, default=False)
     inherited = Column(Boolean, nullable=False, default=False)
     reason = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     tool = relationship("Tool", back_populates="permissions")
     role = relationship("Role", back_populates="permissions")
